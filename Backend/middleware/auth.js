@@ -4,10 +4,15 @@ const User = require('../models/User');
 //protect route
 exports.protect = async(req, res, next) => {
     let token;
+    // ✅ ดึง token จาก header ถ้ามี
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
         token = req.headers.authorization.split(' ')[1];
     }
-    //Make sure token exists
+    // ✅ ดึง token จาก cookie ถ้ายังไม่มี
+    if (!token && req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+  }
+    //Make sure token exists // ❌ ถ้ายังไม่มี token เลย
     if(!token ||token == 'null'){
         return res.status(401).json(
             {

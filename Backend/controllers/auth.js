@@ -57,20 +57,23 @@ exports.login = async(req,res,next)=>{
 
     //Validate email & password
     if(!email || !password){
-        return res.status(400).json({success:false,msg:'Please provide an email and password'});
+        return res.status(400).json({success:false,message:'Please provide an email and password'});
     }
     //check for user
     const user=await User.findOne({email}).select('+password');
     
+    // if(!user){
+    //     return res.status(400).json({success:false,msg:'Invalid credentials'});
+    // }
     if(!user){
-        return res.status(400).json({success:false,msg:'Invalid credentials'});
+        return res.status(400).json({success:false,message: 'User not found'});
     }
 
     //check if password matches
     const isMatch = await user.matchPassword(password);
 
     if(!isMatch){
-        return res.status(401).json({success:false,msg:'Invalid credentials'});
+        return res.status(401).json({success:false,message:'Invalid credentials'});
     }
     // res.status(200).json({
     //     success:true,
@@ -82,7 +85,11 @@ exports.login = async(req,res,next)=>{
     
         res
             .status(statusCode)
-            .cookie('token', token)
+            .cookie('token', token,{
+                httpOnly: true,
+                secure: false,      // เปลี่ยนเป็น true ถ้าใช้ HTTPS
+                sameSite: 'Lax',
+            })
             .json({
                 success: true,
                 token,
@@ -98,6 +105,7 @@ sendTokenResponse(user,200,res);
 };
 
 exports.getMe = async(req,res,next)=>{
+    console.log("Cookies: ", req.cookies); // ✅ ลองดูว่ามี token หรือไม่
     const user= await User.findById(req.user.id);
     res.status(200).json({
         success:true,
