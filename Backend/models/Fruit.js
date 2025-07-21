@@ -19,4 +19,11 @@ const FruitSchema = new mongoose.Schema({
   }
 });
 
+// FruitSchema.virtual('total').get(function () {
+//   return this.amount * this.unit;
+// });
+
+// FruitSchema.set('toJSON', { virtuals: true }); // สำคัญ!
+
+
 module.exports = mongoose.model('Fruit', FruitSchema);
