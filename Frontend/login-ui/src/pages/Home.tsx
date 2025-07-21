@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+
 interface Fruit {
   name: string;
   amount: number;
@@ -111,68 +112,23 @@ const Home: React.FC = () => {
 
 export default Home;
 
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
+// //CRUD ✅ 
 
-// const FruitTable = () => {
-//   const [fruits, setFruits] = useState([]);
-//   const [page, setPage] = useState(1);
-//   const [limit, setLimit] = useState(2);
-//   const [totalPages, setTotalPages] = useState(1);
-
-//   const fetchFruits = async () => {
-//     try {
-//       const res = await axios.get(`http://localhost:3000/api/v1/csv?page=${page}&limit=${limit}`, {
-//         withCredentials: true,
-//       });
-//       setFruits(res.data.data);
-//       setTotalPages(res.data.pagination.totalPages);
-//     } catch (err) {
-//       console.error('Failed to fetch fruits', err);
-//     }
-//   };
-
-//   useEffect(() => {
+//   const handleCreate = async () => {
+//     if (!allowedFruits.includes(newFruit.name)) return alert('Invalid fruit');
+//     await axios.post('/api/v1/fruits', newFruit);
+//     setNewFruit({ name: '', amount: 0, unit: 0 });
 //     fetchFruits();
-//   }, [page, limit]);
-
-//   const handlePrev = () => {
-//     if (page > 1) setPage(page - 1);
 //   };
 
-//   const handleNext = () => {
-//     if (page < totalPages) setPage(page + 1);
+//   const handleUpdate = async () => {
+//     if (!editFruit || !editFruit._id) return;
+//     await axios.put(`/api/v1/fruits/${editFruit._id}`, editFruit);
+//     setEditFruit(null);
+//     fetchFruits();
 //   };
 
-//   return (
-//     <div>
-//       <h2>🍍 Fruit Data</h2>
-//       <table>
-//         <thead>
-//           <tr>
-//             <th>Name</th><th>Amount</th><th>Unit</th><th>Total</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {fruits.map((fruit, index) => (
-//             <tr key={index}>
-//               <td>{fruit.name}</td>
-//               <td>{fruit.amount}</td>
-//               <td>{fruit.unit}</td>
-//               <td>{fruit.total}</td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-
-//       <div style={{ marginTop: '10px' }}>
-//         <button onClick={handlePrev} disabled={page === 1}>Prev</button>
-//         <span style={{ margin: '0 10px' }}>Page {page} / {totalPages}</span>
-//         <button onClick={handleNext} disabled={page === totalPages}>Next</button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default FruitTable;
-
+//   const handleDelete = async (id: string) => {
+//     await axios.delete(`/api/v1/fruits/${id}`);
+//     fetchFruits();
+//   };
