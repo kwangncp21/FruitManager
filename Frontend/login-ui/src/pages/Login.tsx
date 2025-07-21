@@ -24,7 +24,7 @@ export default function Login() {
         { withCredentials: true });
 
       console.log("✅ Login response:", res);
-      navigate("/home");
+      navigate("/home"); //ถ้าผ่านให้ไปหน้า home
     } catch (err: any) {
       console.error("❌ Login error:", err);
       setError("Login failed: " + (err.response?.data?.message || err.message));
