@@ -26,7 +26,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Home />} /> // เพิ่มภายหลังได้
+        <Route path="/home" element={<Home />} />
       </Routes>
     </Router>
   );
