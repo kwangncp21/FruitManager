@@ -1,8 +1,4 @@
 node_modules/*
 # .gitignore
 config/config.env
-README.md
 config/
-package-lock.json
-package.json
-server.js
