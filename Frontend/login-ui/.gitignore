@@ -17,6 +17,9 @@
 .env.development.local
 .env.test.local
 .env.production.local
+# .gitignore
+config/config.env
+
 
 npm-debug.log*
 yarn-debug.log*
