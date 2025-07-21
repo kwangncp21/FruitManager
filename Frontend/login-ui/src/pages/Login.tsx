@@ -20,6 +20,9 @@ export default function Login() {
         password,
       }, { withCredentials: true });
 
+        await axios.get("http://localhost:3000/api/v1/auth/me", 
+        { withCredentials: true });
+
       console.log("✅ Login response:", res);
       navigate("/home");
     } catch (err: any) {
