@@ -4,7 +4,7 @@ exports.register= async (req,res,next)=>{
     try{
         const {name,telephone,email,password,role} = req.body;
 
-        //create uder to the database
+        //create user to the database
         const user = await User.create({
             name,
             telephone,
