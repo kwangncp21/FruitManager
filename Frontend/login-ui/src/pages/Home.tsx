@@ -3,6 +3,8 @@ import axios from 'axios';
 
 
 interface Fruit {
+//   ✅
+  _id?: string;
   name: string;
   amount: number;
   unit: number;
@@ -14,9 +16,11 @@ const Home: React.FC = () => {
   const [fruits, setFruits] = useState<Fruit[]>([]);
   const [page, setPage] = useState(1);
   const [file, setFile] = useState<File | null>(null);
+//   ✅
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFruit, setEditFruit] = useState<Partial<Fruit>>({});
 
   const pageSize = 5;
-//   const totalPages = Math.ceil(fruits.length / pageSize); //frontend pagination
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchFruits = async () => {
@@ -36,7 +40,6 @@ const Home: React.FC = () => {
 
   const handleUpload = async () => {
     if (!file) return alert('Please select a file');
-
     const formData = new FormData();
     formData.append('file', file);
 
@@ -50,10 +53,35 @@ const Home: React.FC = () => {
       console.error('Upload failed:', err);
     }
   };
+//   ✅
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/v1/csv/delRecord/${id}`);
+      fetchFruits();
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
+  };
 
-//   const currentData = fruits.slice((page - 1) * pageSize, page * pageSize);
+//   ✅
+  const handleEdit = (fruit: Fruit) => {
+    setEditingId(fruit._id || null);
+    setEditFruit({ ...fruit });
+  };
+//   ✅
+  const handleUpdate = async () => {
+    try {
+      if (!editingId) return;
+      await axios.put(`http://localhost:3000/api/v1/csv/updateRecord/${editingId}`, editFruit);
+      setEditingId(null);
+      setEditFruit({});
+      fetchFruits();
+    } catch (err) {
+      console.error('Update failed:', err);
+    }
+  };
 
-  return (
+return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">🍍 Fruit Data</h1>
 
@@ -74,21 +102,50 @@ const Home: React.FC = () => {
             <th className="px-4 py-2">Amount</th>
             <th className="px-4 py-2">Unit</th>
             <th className="px-4 py-2">Total</th>
+            <th className="px-4 py-2">Actions</th>
           </tr>
         </thead>
         <tbody>
           {fruits.map((fruit, index) => (
             <tr key={index} className="text-center border-t">
-              <td className="px-4 py-2">{fruit.name}</td>
-              <td className="px-4 py-2">{fruit.amount}</td>
-              <td className="px-4 py-2">{fruit.unit}</td>
-              <td className="px-4 py-2">{fruit.total}</td>
+              <td className="px-4 py-2">
+                {editingId === fruit._id ? (
+                  <input value={editFruit.name} onChange={e => setEditFruit({ ...editFruit, name: e.target.value })} />
+                ) : fruit.name}
+              </td>
+              <td className="px-4 py-2">
+                {editingId === fruit._id ? (
+                  <input type="number" value={editFruit.amount} onChange={e => setEditFruit({ ...editFruit, amount: Number(e.target.value) })} />
+                ) : fruit.amount}
+              </td>
+              <td className="px-4 py-2">
+                {editingId === fruit._id ? (
+                  <input type="number" value={editFruit.unit} onChange={e => setEditFruit({ ...editFruit, unit: Number(e.target.value) })} />
+                ) : fruit.unit}
+              </td>
+              <td className="px-4 py-2">
+                {editingId === fruit._id ? (
+                  Number(editFruit.amount) * Number(editFruit.unit)
+                ) : fruit.total}
+              </td>
+              <td className="px-4 py-2 space-x-2">
+                {editingId === fruit._id ? (
+                  <>
+                    <button onClick={handleUpdate} className="text-green-600">Save</button>
+                    <button onClick={() => setEditingId(null)} className="text-gray-600">Cancel</button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => handleEdit(fruit)} className="text-blue-600">Edit</button>
+                    <button onClick={() => handleDelete(fruit._id!)} className="text-red-600">Delete</button>
+                  </>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* Pagination */}
       <div className="flex justify-between mt-6">
         <button
           className="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50"
@@ -111,24 +168,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-
-// //CRUD ✅ 
-
-//   const handleCreate = async () => {
-//     if (!allowedFruits.includes(newFruit.name)) return alert('Invalid fruit');
-//     await axios.post('/api/v1/fruits', newFruit);
-//     setNewFruit({ name: '', amount: 0, unit: 0 });
-//     fetchFruits();
-//   };
-
-//   const handleUpdate = async () => {
-//     if (!editFruit || !editFruit._id) return;
-//     await axios.put(`/api/v1/fruits/${editFruit._id}`, editFruit);
-//     setEditFruit(null);
-//     fetchFruits();
-//   };
-
-//   const handleDelete = async (id: string) => {
-//     await axios.delete(`/api/v1/fruits/${id}`);
-//     fetchFruits();
-//   };
