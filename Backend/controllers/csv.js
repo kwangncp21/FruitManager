@@ -1,4 +1,3 @@
-// controllers/fruitController.js
 const csv = require('csvtojson');
 const fs = require('fs');
 const Fruit = require('../models/Fruit');
@@ -28,15 +27,6 @@ exports.uploadFruitCSV = async (req, res) => {
   }
 };
 
-// exports.getFruitData = async (req, res) => {
-//   try {
-//     const fruits = await Fruit.find();
-//     res.status(200).json({ success: true, data: fruits });
-//   } catch (err) {
-//     res.status(500).json({ success: false, message: 'Failed to fetch fruits' });
-//   }
-// };
-
 exports.getFruitData = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -49,12 +39,10 @@ exports.getFruitData = async (req, res) => {
     ];
 
     const fruits = await Fruit.find({ name: { $in: allowedFruits } })
-    // const fruits = await Fruit.find()
       .skip(skip)
       .limit(limit);
 
     const total = await Fruit.countDocuments({ name: { $in: allowedFruits } });
-    // const total = await Fruit.countDocuments();
 
     res.status(200).json({
       success: true,
@@ -79,20 +67,6 @@ exports.deleteAllFruits = async (req, res) => {
   }
 };
 
-
-// // POST
-// exports.addRecord = async (req, res) => {
-//   try {
-//     // console.log('[DEBUG] body:', req.body);  // ✅ ดูว่ามี total หรือไม่
-//     const { name, amount, unit, total } = req.body;
-//     const newFruit = new Fruit({ name, amount, unit, total });
-//     await newFruit.save();
-//     res.status(201).json({ success: true, data: newFruit });
-//   } catch (err) {
-//     res.status(400).json({ success: false, error: err.message });
-//   }
-// };
-
 exports.addRecord = async (req, res) => {
   try {
     const data = req.body; // ← array ของ object
@@ -111,19 +85,6 @@ exports.addRecord = async (req, res) => {
   }
 };
 
-
-// // PUT
-// exports.updateRecord = async (req, res) => {
-//   try {
-//     const fruit = await Fruit.findByIdAndUpdate(req.params.id, req.body, {
-//       new: true
-//     });
-//     res.status(200).json({ success: true, data: fruit });
-//   } catch (err) {
-//     res.status(400).json({ success: false, error: err.message });
-//   }
-// };
-
 exports.updateRecord = async (req, res) => {
  try {
     const { amount, unit } = req.body;
@@ -139,7 +100,6 @@ exports.updateRecord = async (req, res) => {
   }
 };
 
-// DELETE
 exports.delRecord = async (req, res) => {
   try {
     await Fruit.findByIdAndDelete(req.params.id);
@@ -184,5 +144,3 @@ exports.getAllRecord = async (req, res, next) => {
         });
     }
 };
-
-

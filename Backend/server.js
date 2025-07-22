@@ -10,12 +10,8 @@ connectDB();
 
 const app = express();
 
-// app.use(cors({
-//   origin: 'http://localhost:5500', // เปลี่ยนตาม frontend ที่ใช้
-//   credentials: true
-// }));
 app.use(cors({
-  origin: 'http://localhost:3001', // เปลี่ยนตาม frontend ที่ใช้
+  origin: 'http://localhost:3001', // frontend port
   credentials: true
 }));
 
