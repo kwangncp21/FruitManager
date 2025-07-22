@@ -10,12 +10,20 @@ exports.uploadFruitCSV = async (req, res) => {
 
     const jsonArray = await csv().fromFile(req.file.path);
 
+    // const fruits = jsonArray.map(item => ({
+    //   name: item.name,
+    //   amount: Number(item.amount),
+    //   unit: Number(item.unit),
+    //   total: Number(item.amount) * Number(item.unit),
+    // }));
     const fruits = jsonArray.map(item => ({
-      name: item.name,
-      amount: Number(item.amount),
-      unit: Number(item.unit),
-      total: Number(item.amount) * Number(item.unit),
-    }));
+        Date: item.Date,
+        ProductName: item['Product Name'],
+        Color: item.Color,
+        Amount: Number(item.Amount),
+        Unit: Number(item.Unit),
+        Total: Number(item.amount) * Number(item.unit)
+        }));
 
     const result = await Fruit.insertMany(fruits);
     fs.unlinkSync(req.file.path);
@@ -72,10 +80,15 @@ exports.addRecord = async (req, res) => {
     const data = req.body; // ← array ของ object
 
     const fruits = data.map(item => ({
-      name: item.name,
-      amount: Number(item.amount),
-      unit: Number(item.unit),
-      total: Number(item.total)
+    //   name: item.name,
+    //   amount: Number(item.amount),
+    //   unit: Number(item.unit),
+    //   total: Number(item.total)
+      Date: item.Date,
+      ProductName: item.ProductName,
+      Color: item.Color,
+      Amount: Number(item.Amount),
+      Unit: Number(item.Unit)
     }));
 
     const result = await Fruit.insertMany(fruits);
@@ -85,9 +98,29 @@ exports.addRecord = async (req, res) => {
   }
 };
 
+// exports.updateRecord = async (req, res) => {
+//  try {
+//     const { amount, unit } = req.body;
+//     req.body.total = Number(amount) * Number(unit);
+
+//     const fruit = await Fruit.findByIdAndUpdate(req.params.id, req.body, {
+//       new: true
+//     });
+
+//     res.status(200).json({ success: true, data: fruit });
+//   } catch (err) {
+//     res.status(400).json({ success: false, error: err.message });
+//   }
+// };
+
 exports.updateRecord = async (req, res) => {
- try {
+  try {
     const { amount, unit } = req.body;
+
+    if (isNaN(amount) || isNaN(unit)) {
+      return res.status(400).json({ success: false, error: 'Amount and Unit must be numbers' });
+    }
+
     req.body.total = Number(amount) * Number(unit);
 
     const fruit = await Fruit.findByIdAndUpdate(req.params.id, req.body, {
@@ -99,6 +132,7 @@ exports.updateRecord = async (req, res) => {
     res.status(400).json({ success: false, error: err.message });
   }
 };
+
 
 exports.delRecord = async (req, res) => {
   try {
