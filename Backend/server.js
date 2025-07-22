@@ -28,7 +28,7 @@ const auth = require('./routes/auth');
 const csvRoute = require('./routes/csv');
 
 //Routing
-app.use(`/api/v1/auth`,auth);
+app.use('/api/v1/auth',auth);
 app.use('/api/v1/csv', csvRoute);
 
 

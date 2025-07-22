@@ -81,25 +81,59 @@ exports.deleteAllFruits = async (req, res) => {
 };
 
 
-// POST
+// // POST
+// exports.addRecord = async (req, res) => {
+//   try {
+//     // console.log('[DEBUG] body:', req.body);  // ✅ ดูว่ามี total หรือไม่
+//     const { name, amount, unit, total } = req.body;
+//     const newFruit = new Fruit({ name, amount, unit, total });
+//     await newFruit.save();
+//     res.status(201).json({ success: true, data: newFruit });
+//   } catch (err) {
+//     res.status(400).json({ success: false, error: err.message });
+//   }
+// };
+
 exports.addRecord = async (req, res) => {
   try {
-    // console.log('[DEBUG] body:', req.body);  // ✅ ดูว่ามี total หรือไม่
-    const { name, amount, unit, total } = req.body;
-    const newFruit = new Fruit({ name, amount, unit, total });
-    await newFruit.save();
-    res.status(201).json({ success: true, data: newFruit });
+    const data = req.body; // ← array ของ object
+
+    const fruits = data.map(item => ({
+      name: item.name,
+      amount: Number(item.amount),
+      unit: Number(item.unit),
+      total: Number(item.total)
+    }));
+
+    const result = await Fruit.insertMany(fruits);
+    res.status(201).json({ success: true, data: result });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
 };
 
-// PUT
+
+// // PUT
+// exports.updateRecord = async (req, res) => {
+//   try {
+//     const fruit = await Fruit.findByIdAndUpdate(req.params.id, req.body, {
+//       new: true
+//     });
+//     res.status(200).json({ success: true, data: fruit });
+//   } catch (err) {
+//     res.status(400).json({ success: false, error: err.message });
+//   }
+// };
+
 exports.updateRecord = async (req, res) => {
-  try {
+ try {
+    const { amount, unit } = req.body;
+    req.body.total = Number(amount) * Number(unit);
+
     const fruit = await Fruit.findByIdAndUpdate(req.params.id, req.body, {
       new: true
     });
+
     res.status(200).json({ success: true, data: fruit });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
@@ -107,13 +141,49 @@ exports.updateRecord = async (req, res) => {
 };
 
 // DELETE
-exports.delOneRecord = async (req, res) => {
+exports.delRecord = async (req, res) => {
   try {
     await Fruit.findByIdAndDelete(req.params.id);
     res.status(200).json({ success: true });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
+};
+
+exports.getRecord = async (req, res, next) => {
+    try {
+        const fruit = await Fruit.findById(req.params.id);
+        if (!Fruit) {
+            return res.status(404).json({
+                success: false,
+                msg: "Sorry, no available workspace!"
+            });
+        }
+        res.status(200).json({
+            success: true,
+            data: fruit
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+exports.getAllRecord = async (req, res, next) => {
+    try {
+        const users = await Fruit.find({});  // Retrieve all users from the database
+
+        res.status(200).json({
+            success: true,
+            count: users.length,
+            data: users
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve users'
+        });
+    }
 };
 
 
