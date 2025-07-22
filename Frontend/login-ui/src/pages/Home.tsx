@@ -2,14 +2,23 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 
-interface Fruit {
-//   ✅
-  _id?: string;
-  name: string;
-  amount: number;
-  unit: number;
-  total: number;
-}
+// interface Fruit {
+//   // ✅
+//   _id?: string;
+//   name: string;
+//   amount: number;
+//   unit: number;
+//   total: number;
+// }
+  interface Fruit {
+    _id?: string;
+    date: string;
+    productName: string;
+    color: string;
+    amount: number;
+    unit: number;
+    total:number;
+  }
 
 const Home: React.FC = () => {
 
@@ -27,7 +36,20 @@ const Home: React.FC = () => {
     try {
     //   const res = await axios.get('http://localhost:3000/api/v1/csv', { withCredentials: true });
       const res = await axios.get(`http://localhost:3000/api/v1/csv?page=${page}&limit=${pageSize}`, { withCredentials: true });
-      setFruits(res.data.data); //ข้อมูลเเต่ละหน้า
+      console.log('Fetched response:', res.data); // 👈 ดูใน DevTools
+
+      // setFruits(res.data.data); //ข้อมูลเเต่ละหน้า
+      setFruits(
+      res.data.data.map((item: any) => ({
+        _id: item._id,
+        date: item.Date,
+        productName: item.ProductName,
+        color: item.Color,
+        amount: item.Amount,
+        unit: item.Unit,
+        total: item.Amount * item.Unit
+      }))
+    );
       setTotalPages(res.data.pagination.totalPages); // ✅ มาจาก backend
     } catch (err) {
       console.error('Failed to fetch fruits', err);
@@ -66,13 +88,21 @@ const Home: React.FC = () => {
 //   ✅
   const handleEdit = (fruit: Fruit) => {
     setEditingId(fruit._id || null);
-    setEditFruit({ ...fruit });
+    setEditFruit({
+      date: fruit.date.slice(0, 10), // แปลงเป็น yyyy-MM-dd
+      productName: fruit.productName,
+      color: fruit.color,
+      amount: fruit.amount,
+      unit: fruit.unit
+    });
   };
 //   ✅
   const handleUpdate = async () => {
     try {
       if (!editingId) return;
-      await axios.put(`http://localhost:3000/api/v1/csv/updateRecord/${editingId}`, editFruit);
+      console.log('🟡 Data to update:', editFruit);
+      const res = await axios.put(`http://localhost:3000/api/v1/csv/updateRecord/${editingId}`, editFruit);
+      console.log('✅ Updated result:', res.data);
       setEditingId(null);
       setEditFruit({});
       fetchFruits();
@@ -80,6 +110,7 @@ const Home: React.FC = () => {
       console.error('Update failed:', err);
     }
   };
+
   const handleLogout = async () => {
   try {
     await axios.get('http://localhost:3000/api/v1/auth/logout', { withCredentials: true });
@@ -88,8 +119,6 @@ const Home: React.FC = () => {
     console.error('Logout failed:', err);
   }
 };
-
-
 
 return (
 
@@ -116,6 +145,88 @@ return (
 
       <table className="w-full border table-auto">
         <thead className="bg-gray-200">
+  <tr>
+    <th className="px-4 py-2">Date</th>
+    <th className="px-4 py-2">Product Name</th>
+    <th className="px-4 py-2">Color</th>
+    <th className="px-4 py-2">Amount</th>
+    <th className="px-4 py-2">Unit</th>
+    <th className="px-4 py-2">Total</th>
+    <th className="px-4 py-2 text-right">Actions</th>
+  </tr>
+</thead>
+
+<tbody>
+  {fruits.map((fruit, index) => (
+    <tr key={index} className="text-center border-t">
+      <td className="px-4 py-2">
+        {editingId === fruit._id ? (
+          <input
+            type="date"
+            value={editFruit.date}
+            onChange={(e) => setEditFruit({ ...editFruit, date: e.target.value })}
+          />
+        ) : fruit.date}
+      </td>
+      <td className="px-4 py-2">
+        {editingId === fruit._id ? (
+          <input
+            value={editFruit.productName}
+            onChange={(e) => setEditFruit({ ...editFruit, productName: e.target.value })}
+          />
+        ) : fruit.productName}
+      </td>
+      <td className="px-4 py-2">
+        {editingId === fruit._id ? (
+          <input
+            value={editFruit.color}
+            onChange={(e) => setEditFruit({ ...editFruit, color: e.target.value })}
+          />
+        ) : fruit.color}
+      </td>
+      <td className="px-4 py-2">
+        {editingId === fruit._id ? (
+          <input
+            type="number"
+            value={editFruit.amount}
+            onChange={(e) => setEditFruit({ ...editFruit, amount: Number(e.target.value) })}
+          />
+        ) : fruit.amount}
+      </td>
+      <td className="px-4 py-2">
+        {editingId === fruit._id ? (
+          <input
+            type="number"
+            value={editFruit.unit}
+            onChange={(e) => setEditFruit({ ...editFruit, unit: Number(e.target.value) })}
+          />
+        ) : fruit.unit}
+      </td>
+      <td className="px-4 py-2">
+        {editingId === fruit._id
+          ? Number(editFruit.amount) * Number(editFruit.unit)
+          : fruit.total}
+      </td>
+
+
+      <td className="px-4 py-2 space-x-2">
+        {editingId === fruit._id ? (
+          <>
+            <button onClick={handleUpdate} className="text-green-600">Save</button>
+            <button onClick={() => setEditingId(null)} className="text-gray-600">Cancel</button>
+          </>
+        ) : (
+          <>
+            <button onClick={() => handleEdit(fruit)} className="text-blue-600">Edit</button>
+            <button onClick={() => handleDelete(fruit._id!)} className="text-red-600">Delete</button>
+          </>
+        )}
+      </td>
+
+    </tr>
+  ))}
+</tbody>
+        {/* <thead className="bg-gray-200">
           <tr>
             <th className="px-4 py-2">Name</th>
             <th className="px-4 py-2">Amount</th>
@@ -162,7 +273,7 @@ return (
               </td>
             </tr>
           ))}
-        </tbody>
+        </tbody> */}
       </table>
 
       <div className="flex justify-between mt-6">
