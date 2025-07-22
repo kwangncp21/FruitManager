@@ -37,7 +37,6 @@ exports.uploadFruitCSV = async (req, res) => {
 //   }
 // };
 
-
 exports.getFruitData = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
