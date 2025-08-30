@@ -31,7 +31,7 @@ exports.getFruitData = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 2;
-    const skip = (page - 1) * limit;
+    const skip = (page - 1) * limit;  //hidden code
 
     const allowedFruits = [
       'Banana','Cherry','Apple','Orange','Watermelon',
